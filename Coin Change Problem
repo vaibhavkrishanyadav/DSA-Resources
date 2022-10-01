@@ -1,0 +1,57 @@
+class Solution {
+    
+    int solve(vector<int> & coins, int n, int amount, vector<vector<int>>& dp)
+    {
+        if(amount == 0)
+            return 0;
+        if(n == 0)
+            return INT_MAX;
+        
+        if(dp[n][amount] != -1)
+            return dp[n][amount];
+        
+        if(amount < coins[n-1])
+            return dp[n][amount] = solve(coins, n - 1, amount, dp);
+        
+        int val1 = solve(coins, n, amount - coins[n-1], dp);
+        val1 += (val1 != INT_MAX)? 1 : 0;
+        int val2 = solve(coins, n - 1, amount, dp);
+        return dp[n][amount] = min(val1, val2);
+    }
+    
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        
+//         int n = coins.size();
+//         vector<vector<int>> dp(n + 1, vector<int>(amount + 1, -1));
+       
+//         int val = solve(coins, n, amount, dp);
+//         return (val == INT_MAX)? -1 : val;
+        
+        int n = coins.size();
+        vector<vector<int>> dp(n+1, vector<int>(amount+1));
+        
+        for(int i = 0; i <= amount; i++)
+            dp[0][i] = INT_MAX;
+        
+        for(int i = 0; i <= n; i++)
+            dp[i][0] = 0;
+        
+        for(int i = 1; i <= n; i++)
+        {
+            for(int j = 1; j <= amount; j++)
+            {
+                if(j < coins[i - 1])
+                    dp[i][j] = dp[i-1][j];
+                else
+                {
+                    int val1 = dp[i][j - coins[i - 1]];
+                    val1 += (val1 != INT_MAX)? 1 : 0;
+                    int val2 = dp[i-1][j];
+                    dp[i][j] = min(val1, val2);
+                }
+            }
+        }
+        return (dp[n][amount] == INT_MAX)? -1 : dp[n][amount];
+    }
+};
